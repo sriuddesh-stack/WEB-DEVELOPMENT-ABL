@@ -5,11 +5,17 @@
 - **Name:** Jaswanth Ujwal
 - **Branch:** CSM
 - **Roll No:** 26001303
+- **Year:** B.Tech 1st Year
 
 ## Case Studies
 
 1. Personal Portfolio Website
-2. College Information and Admissions Website
+2. College Information Website
 3. Online News Portal
 
-Each project is provided as a single `index.html` file with HTML, CSS, and JavaScript included in the same file.
+## Technologies Used
+
+- HTML
+- CSS
+
+Each case study contains a single `index.html` file. The pages use basic HTML and CSS concepts suitable for B.Tech 1st Year. No JavaScript is used.
