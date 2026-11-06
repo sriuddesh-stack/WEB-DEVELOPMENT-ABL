@@ -1,0 +1,60 @@
+name: Capture project screenshots
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Capture HTML outputs
+        run: |
+          node <<'NODE'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          const path = require('path');
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const projects = [
+              '01-Personal-Portfolio',
+              '02-College-Website',
+              '03-Online-News-Portal'
+            ];
+            for (const project of projects) {
+              const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 });
+              const file = path.resolve(project, 'index.html');
+              await page.goto('file://' + file, { waitUntil: 'networkidle' });
+              await page.screenshot({ path: path.join(project, 'screenshots', 'output.png'), fullPage: true });
+              await page.close();
+            }
+            await browser.close();
+          })().catch(err => { console.error(err); process.exit(1); });
+          NODE
+
+      - name: Commit screenshots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add 01-Personal-Portfolio/screenshots/output.png 02-College-Website/screenshots/output.png 03-Online-News-Portal/screenshots/output.png
+          if ! git diff --cached --quiet; then
+            git commit -m "Add browser output screenshots"
+            git push
+          fi
